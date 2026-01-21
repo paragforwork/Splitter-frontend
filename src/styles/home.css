@@ -1,0 +1,342 @@
+/* src/styles/home.css */
+
+:root {
+  /* DARK MODE PALETTE */
+  --primary: #6366f1;       /* Indigo-500: A bit softer than deep blue */
+  --bg-color: #0f172a;      /* Slate-900: Deep dark background */
+  --card-bg: #1e293b;       /* Slate-800: Lighter dark for cards */
+  --text-primary: #f1f5f9;  /* Slate-100: Almost white for readability */
+  --text-secondary: #94a3b8;/* Slate-400: Muted grey for subtext */
+  
+  /* Financial Colors */
+  --success: #34d399;       /* Emerald-400: Bright Green */
+  --danger: #f87171;        /* Red-400: Soft Red */
+  
+  /* UI Borders */
+  --border-color: #334155;  /* Slate-700: For subtle outlines */
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  /* Smooth transition when toggling modes in future */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* --- BOTTOM NAVIGATION --- */
+.bottom-nav-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px; /* Slightly taller for mobile comfort */
+  background: rgba(30, 41, 59, 0.95); /* Semi-transparent dark */
+  backdrop-filter: blur(10px);        /* Glassmorphism effect */
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+  padding-bottom: 10px; /* Safe area for iPhone home bar */
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 60px;
+  transition: transform 0.1s;
+}
+
+.nav-item:active {
+  transform: scale(0.9);
+}
+
+.nav-item span {
+  font-size: 10px;
+  margin-top: 6px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.nav-item .active-text {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* --- HOME PAGE --- */
+.home-container {
+  padding: 20px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  margin-top: 10px;
+}
+
+.welcome-text h1 {
+  font-size: 24px;
+  margin: 0;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.welcome-text p {
+  margin: 4px 0 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.profile-pic img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--card-bg); /* Dark border matches card */
+  /* Glow effect */
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.3); 
+}
+
+/* --- HERO CARD --- */
+.hero-section {
+  margin-bottom: 30px;
+}
+
+.balance-card {
+  border-radius: 24px;
+  padding: 25px;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  /* Dark mode shadow is more about "glow" */
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Brighter Gradients for Dark Mode Contrast */
+.green-gradient {
+  background: linear-gradient(135deg, #82e4c5 0%, #02513a 100%);
+  border: 1px solid #10b981;
+}
+
+.red-gradient {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  border: 1px solid #ef4444;
+}
+
+.balance-card span {
+  font-size: 14px;
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.balance-card h2 {
+  font-size: 38px;
+  margin: 12px 0 8px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.balance-card p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.settle-btn {
+  margin-top: 24px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(5px);
+  transition: background 0.2s;
+}
+
+.settle-btn:active {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* --- QUICK ACTIONS --- */
+.quick-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 35px;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 30%;
+}
+
+.icon-box {
+  width: 60px;
+  height: 60px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  /* Dark mode specific borders */
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.icon-box:active {
+  transform: scale(0.92);
+}
+
+/* Adjusted colors to be less neon, more pastel on dark bg */
+.icon-box.orange { background: #ea580c; box-shadow: 0 4px 20px rgba(234, 88, 12, 0.4); }
+.icon-box.blue { background: #2563eb; box-shadow: 0 4px 20px rgba(37, 99, 235, 0.4); }
+.icon-box.purple { background: #7c3aed; box-shadow: 0 4px 20px rgba(124, 58, 237, 0.4); }
+
+.action-btn span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* --- GROUPS CAROUSEL --- */
+.groups-section {
+  margin-bottom: 35px;
+}
+
+.section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.section-title h3 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.see-all {
+  font-size: 13px;
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.groups-scroll {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none; 
+}
+
+.group-card {
+  min-width: 140px;
+  background: var(--card-bg); /* Slate-800 */
+  padding: 18px;
+  border-radius: 20px;
+  /* Subtle border instead of heavy shadow */
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.group-icon {
+  width: 45px;
+  height: 45px;
+  background: #334155; /* Darker Slate for icon bg */
+  color: #fff;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.group-card h4 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  color: var(--text-primary);
+}
+
+.group-card p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.text-red { color: var(--danger); }
+.text-green { color: var(--success); }
+
+/* --- ACTIVITY LIST --- */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+}
+
+.activity-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+}
+
+/* Darker backgrounds for icons so they don't look washed out */
+.activity-icon.expense { background: rgba(248, 113, 113, 0.15); color: var(--danger); }
+.activity-icon.settlement { background: rgba(52, 211, 153, 0.15); color: var(--success); }
+
+.activity-info {
+  flex: 1;
+}
+
+.activity-text {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.activity-time {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.activity-amount {
+  font-size: 14px;
+  font-weight: 700;
+}

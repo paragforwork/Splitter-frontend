@@ -1,43 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+
+const isTokenValid = () => {
+  const token = localStorage.getItem('authToken');
+  const user = localStorage.getItem('user');
+
+  // 1. Check if credentials exist
+  if (!token || !user) return false;
+
+  try {
+    // 2. Decode using the library (Handles all formatting/errors for you)
+    const decoded = jwtDecode(token);
+    const currentTime = Date.now() / 1000;
+
+    // 3. Check if expired
+    if (decoded.exp < currentTime) {
+      console.log('Token expired - clearing storage');
+      localStorage.clear();
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    // Returns false if token is invalid or corrupt
+    localStorage.clear();
+    return false;
+  }
+};
 
 const PrivateRoute = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // Check auth instantly
+  const isAuthenticated = isTokenValid();
 
-  useEffect(() => {
-    const checkAuth = () => {
-      // Check if token exists in localStorage
-      const token = localStorage.getItem('authToken');
-      const userData = localStorage.getItem('user');
-      
-      if (token && userData) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-      }
-      
-      setLoading(false);
-    };
-
-    checkAuth();
-  }, []);
-
-  if (loading) {
-    return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        fontSize: '18px',
-        fontFamily: 'Arial, sans-serif'
-      }}>
-        Loading...
-      </div>
-    );
-  }
-
+  // Render or Redirect
   return isAuthenticated ? <Outlet /> : <Navigate to="/signup" replace />;
 };
 

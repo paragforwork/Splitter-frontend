@@ -1,9 +1,6 @@
-import { useState } from 'react'
-import Home from './pages/home.jsx'
+// This file is not used - main.jsx handles routing directly
+// The app uses React Router in main.jsx with PrivateRoute protection
 
-
-function App() {
-  return <Home/>
+export default function App() {
+  return null;
 }
-
-export default App

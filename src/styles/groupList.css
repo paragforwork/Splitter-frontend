@@ -1,0 +1,346 @@
+/* src/styles/groupsList.css */
+
+/* Reusing your global variables implicitly from index.css or home.css */
+
+.groups-page-container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 0 20px;
+  background-color: var(--bg-color); /* Dark Slate Background */
+}
+
+/* --- HEADER --- */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  margin-bottom: 10px;
+}
+
+.page-header h2 {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.icon-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+/* --- SEARCH BAR --- */
+.search-container {
+  position: relative;
+  margin-bottom: 25px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+}
+
+.search-container input {
+  width: 100%;
+  padding: 14px 14px 14px 45px; /* Left padding for icon */
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  color: var(--text-primary);
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.search-container input:focus {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* --- GROUP CARDS --- */
+.groups-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-bottom: 40px;
+}
+
+.group-list-card {
+  background: var(--card-bg);
+  padding: 15px;
+  border-radius: 18px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.group-list-card:active {
+  transform: scale(0.98);
+  background: rgba(255,255,255,0.03);
+}
+
+/* LEFT SIDE */
+.card-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.group-avatar-lg img {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: #334155;
+}
+
+.group-info h3 {
+  margin: 0 0 6px;
+  font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-sm {
+  font-size: 10px;
+  background: rgba(255,255,255,0.05);
+  color: var(--text-secondary);
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.member-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* RIGHT SIDE (Balance) */
+.card-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-settled {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  background: rgba(255,255,255,0.05);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+
+.balance-tag {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.balance-tag .lbl {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.balance-tag .val {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* COLOR VARIANTS */
+.balance-tag.green .lbl, .balance-tag.green .val {
+  color: var(--success);
+}
+
+.balance-tag.red .lbl, .balance-tag.red .val {
+  color: var(--danger);
+}
+
+.arrow-icon {
+  color: var(--border-color);
+}
+
+.loading-text, .empty-state {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-top: 40px;
+}
+
+.empty-state button {
+  background: transparent;
+  color: var(--primary);
+  border: none;
+  font-weight: 600;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+/* --- MODAL OVERLAY --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.6); /* Dark semi-transparent */
+  backdrop-filter: blur(8px);        /* THE BLUR EFFECT */
+  display: flex;
+  align-items: center; /* Center Vertically */
+  justify-content: center; /* Center Horizontally */
+  z-index: 2000; /* Above everything */
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* --- MODAL CARD --- */
+.modal-content {
+  background: var(--card-bg); /* Use your dark theme variable */
+  width: 90%;
+  max-width: 400px;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  border: 1px solid var(--border-color);
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 20px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+}
+
+/* --- FORM ELEMENTS --- */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 14px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 16px;
+  outline: none;
+  box-sizing: border-box; /* Prevents padding overflow */
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+/* --- TYPE SELECTION GRID --- */
+.type-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-secondary);
+}
+
+.type-option span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* SELECTED STATE */
+.type-option.selected {
+  background: rgba(99, 102, 241, 0.15); /* Primary color low opacity */
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* --- CREATE BUTTON --- */
+.create-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+.create-btn:active {
+  transform: scale(0.98);
+}
+
+/* --- ANIMATIONS --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}

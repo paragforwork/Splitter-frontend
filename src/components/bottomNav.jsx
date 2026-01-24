@@ -12,14 +12,14 @@ const BottomNav = () => {
 
   return (
     <div className="bottom-nav-container">
-      <div className="nav-item" onClick={() => navigate('/dashboard')}>
+      <div className="nav-item" onClick={() => navigate('/')}>
         <Home size={24} color={isActive('/dashboard') ? '#4361ee' : '#94a3b8'} />
         <span className={isActive('/dashboard') ? 'active-text' : ''}>Home</span>
       </div>
 
-      <div className="nav-item" onClick={() => navigate('/groups')}>
-        <Users size={24} color={isActive('/groups') ? '#4361ee' : '#94a3b8'} />
-        <span className={isActive('/groups') ? 'active-text' : ''}>Groups</span>
+      <div className="nav-item" onClick={() => navigate('/grouplist')}>
+        <Users size={24} color={isActive('/grouplist') ? '#4361ee' : '#94a3b8'} />
+        <span className={isActive('/grouplist') ? 'active-text' : ''}>Groups</span>
       </div>
 
       {/* Center FAB Placeholder (Optional visual gap for the 'Add' button if desired) */}

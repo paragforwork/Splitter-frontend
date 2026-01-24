@@ -103,7 +103,7 @@ const Home = () => {
         setShowGroupModal(false);
         setGroupName('');
         setGroupType('OTHER');
-        navigate(`/groups/${data.group._id}`);
+        navigate(`/groupsDetails/${data.group._id}`);
       }
       else{
        alert(data.message || "Failed to create group. Please try again.");  

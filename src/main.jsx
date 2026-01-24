@@ -7,7 +7,9 @@ import Signup from './pages/signup.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Dashboard from './pages/dashboard.jsx'
 import PrivateRoute from './components/privateRoutes.jsx'
-import Group from './pages/group.jsx'
+
+import GroupDetails from './pages/groupDetails.jsx'
+import GroupsList from './pages/groupList.jsx'
 
 const router = createBrowserRouter([
   {
@@ -26,8 +28,11 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: "/groups/:id",
-        element: <Group />
+        path: "/groupsDetails/:id",
+        element: <GroupDetails />
+      },{
+        path: "/grouplist",
+        element: <GroupsList />
       }
     ]
   },

@@ -175,7 +175,7 @@ const GroupsList = () => {
               <div 
                 key={group._id} 
                 className="group-list-card"
-                onClick={() => navigate(`/group/${group._id}`)}
+                onClick={() => navigate(`/groupsDetails/${group._id}`)}
               >
                 {/* Left: Avatar & Info */}
                 <div className="card-left">

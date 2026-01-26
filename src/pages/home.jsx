@@ -1,120 +1,161 @@
 import React, { useState, useEffect } from 'react';
-import BottomNav from '../components/bottomNav.jsx';
-
+import BottomNav from '../components/BottomNav.jsx';
 import '../styles/home.css';
-import { Plus, Camera, Users, Receipt, ArrowRight, X, Briefcase, Home as HomeIcon, Heart, Globe, LogOut } from 'lucide-react';
+import { Plus, UserPlus, Users, Receipt, ArrowRight, X, Briefcase, Home as HomeIcon, Heart, Globe, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const navigate = useNavigate();
 
-  // Get user from localStorage
+  // --- STATES ---
   const [user, setUser] = useState(null);
+  const [groups, setGroups] = useState([]); // <--- Now empty initially
   
+  // Modal States
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [showJoinModal, setShowJoinModal] = useState(false);
+  
+  // Form Data
+  const [groupType, setGroupType] = useState('OTHER');  
+  const [groupName, setGroupName] = useState('');
+  const [joinCode, setJoinCode] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // You can also fetch this dynamically later, keeping static for now
   const [recentActivity] = useState([
     { id: 1, text: "Rahul added 'Dinner at Taj'", amount: "You owe ₹400", time: "2h ago", type: "expense" },
     { id: 2, text: "Amit settled 'Goa Trip'", amount: "You got ₹2,000", time: "5h ago", type: "settlement" },
-    { id: 3, text: "Sneha added 'Uber'", amount: "You owe ₹150", time: "1d ago", type: "expense" }
   ]);
 
-  const [groups] = useState([
-    { id: 1, name: "Goa Trip", type: "TRIP", oweAmount: 500, status: "owe" },
-    { id: 2, name: "Flat 101", type: "HOME", oweAmount: 0, status: "settled" },
-    { id: 3, name: "Office Lunch", type: "OTHER", oweAmount: 1200, status: "owed" }
-  ]);
-
-  const [groupType,setGroupType]= useState('OTHER');  
-  const [groupName,setGroupName]= useState('');
-  const [showGroupModal,setShowGroupModal]= useState(false);  
-  const [loading,setLoading]= useState(false);
-
-  // Check authentication on mount
+  // --- 1. INITIALIZATION & FETCHING ---
   useEffect(() => {
+    // 1. Get User
     const userData = localStorage.getItem('user');
+    let parsedUser = null;
     if (userData) {
       try {
-        const parsedUser = JSON.parse(userData);
-        setUser({
-          name: parsedUser.name || "User",
-          totalBalance: 4500,
-          currency: "₹"
+        parsedUser = JSON.parse(userData);
+        setUser({ 
+            ...parsedUser, 
+            totalBalance: 4500, // You can fetch this real total later
+            currency: "₹" 
         });
-      } catch (error) {
-        console.error("Error parsing user data:", error);
-        setUser({
-          name: "User",
-          totalBalance: 4500,
-          currency: "₹"
-        });
-      }
+      } catch (error) { console.error(error); }
     }
+
+    // 2. Fetch Groups (Only if we have a token)
+    fetchGroups();
   }, []);
+
+  const fetchGroups = async () => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return; // Don't fetch if not logged in
+
+      const response = await fetch('http://localhost:4000/api/groups/allgroups', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setGroups(data.groups);
+      }
+    } catch (error) {
+      console.log("Failed to load groups", error);
+    }
+  };
+
+  // --- 2. HELPER: CALCULATE CARD BALANCE ---
+  // Returns the amount the current user owes/is owed in a specific group
+  const getGroupStatus = (group) => {
+    const currentUserId = user?._id || user?.id || JSON.parse(localStorage.getItem('user'))?.id;
+    if (!currentUserId || !group.simplifyDebts) return { amount: 0, status: 'settled' };
+
+    let balance = 0;
+    group.simplifyDebts.forEach(debt => {
+      // If I am the payer ('from'), I owe money (negative)
+      if (debt.from === currentUserId) balance -= debt.amount;
+      // If I am the receiver ('to'), I get money (positive)
+      if (debt.to === currentUserId) balance += debt.amount;
+    });
+
+    if (balance === 0) return { amount: 0, status: 'settled' };
+    return {
+      amount: Math.abs(balance),
+      status: balance > 0 ? 'owed' : 'owe' // 'owed' means I get money, 'owe' means I pay
+    };
+  };
 
   const handleLogout = () => {
     localStorage.clear();
     navigate('/signup');
   };
 
-  const handleCreateGroup = async() =>{
+  // --- HANDLER: CREATE GROUP ---
+  const handleCreateGroup = async() => {
     setLoading(true);
-    
-    // Validate group name
-    if(!groupName.trim()){
-      alert("Group name cannot be empty");
-      setLoading(false);
-      return;
-    }
+    if(!groupName.trim()){ alert("Group name cannot be empty"); setLoading(false); return; }
     
     try {
       const token = localStorage.getItem('authToken');
+      if (!token) { navigate('/signup'); return; }
       
-      // Check if token exists
-      if (!token) {
-        alert("You are not logged in. Please login first.");
-        localStorage.clear();
-        navigate('/signup');
-        return;
-      }
-      
-      const response=await fetch('http://localhost:4000/api/groups',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':`Bearer ${token}`
-        },
-        body:JSON.stringify({
-          name:groupName,
-          type:groupType
-        })
+      const response = await fetch('http://localhost:4000/api/groups', {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+        body: JSON.stringify({ name: groupName, type: groupType })
       });
 
-      const data=await response.json();
-      
-      // Handle authentication errors
-      if (response.status === 401 || response.status === 403) {
-        alert("Your session has expired. Please login again.");
-        localStorage.clear();
-        navigate('/signup');
-        return;
-      }
+      const data = await response.json();
       
       if(response.ok){
-        //alert(data.message || "Group created successfully!");
         setShowGroupModal(false);
         setGroupName('');
-        setGroupType('OTHER');
-        navigate(`/groupsDetails/${data.group._id}`);
-      }
-      else{
-       alert(data.message || "Failed to create group. Please try again.");  
+        // Refresh list after creation
+        fetchGroups(); 
+        navigate(`/group/${data.group._id}`);
+      } else {
+        alert(data.message || "Failed to create group.");  
       }
     } catch (error) {
-     console.error("Error creating group:",error);
-     alert("Network error. Please check your connection and try again."); 
-    }finally{
+      alert("Network error."); 
+    } finally {
       setLoading(false);
     } 
-  }
+  };
+
+  // --- HANDLER: JOIN GROUP ---
+  const handleJoinGroup = async () => {
+    if(!joinCode.trim() || joinCode.length < 6) {
+      alert("Please enter a valid 6-character code");
+      return;
+    }
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch('http://localhost:4000/api/groups/join', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ shareCode: joinCode.toUpperCase() })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setShowJoinModal(false);
+        setJoinCode('');
+        fetchGroups(); // Refresh list
+        navigate(`/group/${data.groupId}`);
+      } else {
+        alert(data.message || "Failed to join group");
+      }
+    } catch (error) {
+      alert("Server connection failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="home-container">
@@ -126,20 +167,7 @@ const Home = () => {
           <p>Here is your expense overview</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <button 
-            onClick={handleLogout}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: '#666',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '5px',
-              fontSize: '14px'
-            }}
-            title="Logout"
-          >
+          <button onClick={handleLogout} style={{ background: 'transparent', border: 'none', color: '#666' }}>
             <LogOut size={20} />
           </button>
           <div className="profile-pic">
@@ -148,13 +176,12 @@ const Home = () => {
         </div>
       </header>
 
-      {/* 2. HERO CARD (Balance) */}
+      {/* 2. HERO CARD */}
       <section className="hero-section">
         <div className={`balance-card ${user?.totalBalance >= 0 ? 'green-gradient' : 'red-gradient'}`}>
           <span>Total Balance</span>
           <h2>{user?.currency} {Math.abs(user?.totalBalance || 0)}</h2>
           <p>{user?.totalBalance >= 0 ? "you are owed" : "you owe"}</p>
-          
           <button className="settle-btn">
             Settle Up <ArrowRight size={16} style={{marginLeft: '5px'}}/>
           </button>
@@ -171,13 +198,15 @@ const Home = () => {
           <div className="icon-box blue"><Users size={24} color="#fff" /></div>
           <span>Create Group</span>
         </div>
-        <div className="action-btn">
-          <div className="icon-box purple"><Camera size={24} color="#fff" /></div>
-          <span>Scan Bill</span>
+        <div className="action-btn" onClick={() => setShowJoinModal(true)}>
+          <div className="icon-box purple">
+             <UserPlus size={24} color="#fff" />
+          </div>
+          <span>Join Group</span>
         </div>
       </section>
 
-      {/* 4. GROUPS CAROUSEL */}
+      {/* 4. GROUPS CAROUSEL (UPDATED) */}
       <section className="groups-section">
         <div className="section-title">
           <h3>Your Groups</h3>
@@ -185,75 +214,79 @@ const Home = () => {
         </div>
         
         <div className="groups-scroll">
-          {groups.map(group => (
-            <div key={group.id} className="group-card">
-              <div className="group-icon">{group.name.charAt(0)}</div>
-              <h4>{group.name}</h4>
-              <p className={group.status === 'owe' ? 'text-red' : 'text-green'}>
-                {group.status === 'owe' ? `Pay ₹${group.oweAmount}` : `Get ₹${group.oweAmount}`}
-              </p>
+          {groups.length > 0 ? (
+            groups.map(group => {
+              // Calculate status for this specific group
+              const { amount, status } = getGroupStatus(group);
+              
+              return (
+                <div 
+                  key={group._id} 
+                  className="group-card"
+                  onClick={() => navigate(`/group/${group._id}`)} // Make clickable
+                  style={{ cursor: 'pointer' }}
+                >
+                  {/* Icon Letter */}
+                  <div className="group-icon">{group.name.charAt(0).toUpperCase()}</div>
+                  
+                  <h4>{group.name}</h4>
+                  
+                  {/* Dynamic Status Text */}
+                  {status === 'settled' ? (
+                    <p style={{ color: '#94a3b8' }}>Settled up</p>
+                  ) : (
+                    <p className={status === 'owe' ? 'text-red' : 'text-green'}>
+                      {status === 'owe' ? `Pay ₹${amount}` : `Get ₹${amount}`}
+                    </p>
+                  )}
+                </div>
+              );
+            })
+          ) : (
+            <div style={{ padding: '0 20px', color: '#94a3b8', fontSize: '14px' }}>
+              No groups yet. Create or join one!
             </div>
-          ))}
+          )}
         </div>
       </section>
 
-      {/* 5. RECENT ACTIVITY LIST */}
+      {/* 5. RECENT ACTIVITY */}
       <section className="activity-section">
-        <h3>Recent Activity</h3>
-        <div className="activity-list">
-          {recentActivity.map(item => (
-            <div key={item.id} className="activity-item">
-              <div className={`activity-icon ${item.type}`}>
-                {item.type === 'settlement' ? <Receipt size={20} /> : <Receipt size={20} />}
-              </div>
-              <div className="activity-info">
-                <p className="activity-text">{item.text}</p>
-                <span className="activity-time">{item.time}</span>
-              </div>
-              <div className="activity-amount">
-                <span className={item.amount.includes("owe") ? "text-red" : "text-green"}>
-                  {item.amount}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
+         <h3>Recent Activity</h3>
+         <div className="activity-list">
+           {recentActivity.map(item => (
+             <div key={item.id} className="activity-item">
+               <div className={`activity-icon ${item.type}`}>
+                 <Receipt size={20} />
+               </div>
+               <div className="activity-info">
+                 <p className="activity-text">{item.text}</p>
+                 <span className="activity-time">{item.time}</span>
+               </div>
+               <div className="activity-amount">
+                 <span className={item.amount.includes("owe") ? "text-red" : "text-green"}>{item.amount}</span>
+               </div>
+             </div>
+           ))}
+         </div>
       </section>
 
-      {/* Spacer for Bottom Nav */}
       <div style={{height: '80px'}}></div>
-
-      {/* 6. BOTTOM NAVIGATION */}
       <BottomNav />
 
-
-      {/* CREATE GROUP MODAL */}
-
+      {/* --- MODALS (Unchanged logic, kept for completeness) --- */}
       {showGroupModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            
-            {/* Modal Header */}
             <div className="modal-header">
               <h3>Create New Group</h3>
-              <button className="close-btn" onClick={() => setShowGroupModal(false)}>
-                <X size={24} />
-              </button>
+              <button className="close-btn" onClick={() => setShowGroupModal(false)}><X size={24} /></button>
             </div>
-
-            {/* Input: Name */}
             <div className="form-group">
               <label>Group Name</label>
-              <input 
-                type="text" 
-                placeholder="e.g. Goa Trip, Flat 101" 
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-              />
+              <input type="text" placeholder="e.g. Goa Trip" value={groupName} onChange={(e) => setGroupName(e.target.value)} />
             </div>
-
-            {/* Input: Type Selection */}
-            <div className="form-group">
+             <div className="form-group">
               <label>Group Type</label>
               <div className="type-grid">
                 {[
@@ -262,31 +295,44 @@ const Home = () => {
                   { id: 'COUPLE', label: 'Couple', icon: <Heart size={18}/> },
                   { id: 'OTHER', label: 'Other', icon: <Briefcase size={18}/> }
                 ].map((type) => (
-                  <div 
-                    key={type.id}
-                    className={`type-option ${groupType === type.id ? 'selected' : ''}`}
-                    onClick={() => setGroupType(type.id)}
-                  >
-                    {type.icon}
-                    <span>{type.label}</span>
+                  <div key={type.id} className={`type-option ${groupType === type.id ? 'selected' : ''}`} onClick={() => setGroupType(type.id)}>
+                    {type.icon}<span>{type.label}</span>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Submit Button */}
-            <button 
-              className="create-btn" 
-              onClick={handleCreateGroup}
-              disabled={loading}
-            >
+            <button className="create-btn" onClick={handleCreateGroup} disabled={loading}>
               {loading ? "Creating..." : "Create Group"}
             </button>
-
           </div>
         </div>
       )}
 
+      {showJoinModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Join Group</h3>
+              <button className="close-btn" onClick={() => setShowJoinModal(false)}><X size={24} /></button>
+            </div>
+            <div className="form-group">
+              <label>Enter Group Code</label>
+              <input 
+                type="text" placeholder="e.g. X7K9P2" value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+                style={{ textAlign: 'center', fontSize: '20px', letterSpacing: '2px', fontWeight: 'bold', textTransform: 'uppercase' }}
+                maxLength={6}
+              />
+            </div>
+            <p style={{fontSize:'12px', color:'#94a3b8', textAlign:'center', marginBottom:'20px'}}>
+              Ask your friend for the 6-character code found in their group details.
+            </p>
+            <button className="create-btn" onClick={handleJoinGroup} disabled={loading} style={{background: '#7c3aed'}}>
+              {loading ? "Joining..." : "Join Group"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

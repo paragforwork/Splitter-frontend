@@ -13,8 +13,8 @@ const BottomNav = () => {
   return (
     <div className="bottom-nav-container">
       <div className="nav-item" onClick={() => navigate('/')}>
-        <Home size={24} color={isActive('/dashboard') ? '#4361ee' : '#94a3b8'} />
-        <span className={isActive('/dashboard') ? 'active-text' : ''}>Home</span>
+        <Home size={24} color={isActive('/') ? '#4361ee' : '#94a3b8'} />
+        <span className={isActive('/') ? 'active-text' : ''}>Home</span>
       </div>
 
       <div className="nav-item" onClick={() => navigate('/grouplist')}>
@@ -24,14 +24,14 @@ const BottomNav = () => {
 
       {/* Center FAB Placeholder (Optional visual gap for the 'Add' button if desired) */}
       
-      <div className="nav-item" onClick={() => navigate('/activity')}>
-        <Activity size={24} color={isActive('/activity') ? '#4361ee' : '#94a3b8'} />
-        <span className={isActive('/activity') ? 'active-text' : ''}>Activity</span>
+      <div className="nav-item" onClick={() => navigate('/dashboard')}>
+        <Activity size={24} color={isActive('/dashboard') ? '#4361ee' : '#94a3b8'} />
+        <span className={isActive('/dashboard') ? 'active-text' : ''}>Activity</span>
       </div>
 
-      <div className="nav-item" onClick={() => navigate('/profile')}>
-        <User size={24} color={isActive('/profile') ? '#4361ee' : '#94a3b8'} />
-        <span className={isActive('/profile') ? 'active-text' : ''}>Account</span>
+      <div className="nav-item" onClick={() => navigate('/accounts')}>
+        <User size={24} color={isActive('/accounts') ? '#4361ee' : '#94a3b8'} />
+        <span className={isActive('/accounts') ? 'active-text' : ''}>Account</span>
       </div>
     </div>
   );

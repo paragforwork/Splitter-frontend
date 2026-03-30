@@ -1,15 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import './lib/nativeFetchBridge.js'
+import './index.css'
 
 import Home from './pages/home.jsx'
 import Signup from './pages/signup.jsx'
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import Dashboard from './pages/dashboard.jsx'
 import PrivateRoute from './components/privateRoutes.jsx'
+import Accounts from './pages/accounts.jsx'
 
 import GroupDetails from './pages/groupDetails.jsx'
 import GroupsList from './pages/groupList.jsx'
+import AddExpense from './pages/addExpense.jsx'
+import GroupMembers from './pages/groupMembers.jsx'
+import MemberTransactions from './pages/memberTransactions.jsx'
+import GroupSettle from './pages/groupSettle.jsx'
 
 const router = createBrowserRouter([
   {
@@ -28,9 +35,30 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
+        path: "/accounts",
+        element: <Accounts />
+      },
+      {
         path: "/groupsDetails/:id",
         element: <GroupDetails />
-      },{
+      },
+      {
+        path: "/groupsDetails/:id/add-expense",
+        element: <AddExpense />
+      },
+      {
+        path: "/groupsDetails/:id/settle",
+        element: <GroupSettle />
+      },
+      {
+        path: "/groupsDetails/:id/members",
+        element: <GroupMembers />
+      },
+      {
+        path: "/groupsDetails/:id/members/:memberId",
+        element: <MemberTransactions />
+      },
+      {
         path: "/grouplist",
         element: <GroupsList />
       }

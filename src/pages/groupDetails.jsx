@@ -6,6 +6,11 @@ import {
 } from 'lucide-react';
 import '../styles/group.css';
 import BottomNav from '../components/BottomNav';
+import LoadingSpinner from '../components/loadingSpinner.jsx';
+import { getApiBase } from '../lib/apiBase.js';
+
+const formatCurrency = (value) => `₹${Number(value || 0).toLocaleString('en-IN')}`;
+const API_BASE = getApiBase();
 
 const GroupDetails = () => {
   const { id } = useParams();
@@ -28,7 +33,7 @@ const GroupDetails = () => {
     const fetchGroupData = async () => {
       try {
         const token = localStorage.getItem('authToken');
-        const response = await fetch(`http://localhost:4000/api/groups/${id}`, {
+        const response = await fetch(`${API_BASE}/api/groups/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -56,7 +61,7 @@ const GroupDetails = () => {
       const receiverName = receiverObj?._id === currentUserId ? "You" : receiverObj?.name.split(' ')[0];
       return `${payerName} paid ${receiverName}`;
     }
-    return `${payerName} paid ₹${expense.amount}`;
+    return `${payerName} paid ${formatCurrency(expense.amount)}`;
   };
 
   const handleCopyCode = () => {
@@ -67,7 +72,7 @@ const GroupDetails = () => {
     }
   };
 
-  if (loading) return <div className="group-container loading-state">Loading...</div>;
+  if (loading) return <LoadingSpinner fullScreen />;
   if (error) return <div className="group-container error-state">{error}</div>;
 
   return (
@@ -96,15 +101,15 @@ const GroupDetails = () => {
             <span className="label">Your Position</span>
             <div className="balance-amount">
               {group.myBalance === 0 ? "Settled up" : (group.myBalance > 0 ? "You are owed" : "You owe")}
-              <span className="amount">₹{Math.abs(group.myBalance)}</span>
+              <span className="amount">{formatCurrency(Math.abs(group.myBalance))}</span>
             </div>
           </div>
-          <button className="settle-action-btn" onClick={() => navigate(`/group/${id}/settle`)}>
+          <button className="settle-action-btn" onClick={() => navigate(`/groupsDetails/${id}/settle`)}>
             Settle Up <ChevronRight size={16} />
           </button>
         </div>
 
-        <button className="members-btn" onClick={() => navigate(`/group/${id}/members`)}>
+        <button className="members-btn" onClick={() => navigate(`/groupsDetails/${id}/members`)}>
           <div className="btn-content">
             <div className="icon-bg"><Users size={20} /></div>
             <span>View Members ({group.members.length})</span>
@@ -136,7 +141,7 @@ const GroupDetails = () => {
                 </div>
                 <div className="expense-right">
                   <span className={`amount-tag ${expense.isSettlement ? 'green' : 'neutral'}`}>
-                    {expense.isSettlement ? 'Settlement' : `₹${expense.amount}`}
+                    {expense.isSettlement ? 'Settlement' : formatCurrency(expense.amount)}
                   </span>
                 </div>
               </div>
@@ -147,11 +152,35 @@ const GroupDetails = () => {
         </div>
       </section>
 
+      <section className="expenses-feed net-debts-section">
+        <div className="feed-header">
+          <h3>Net Simplified Debts</h3>
+        </div>
+        <div className="feed-list">
+          {group.simplifyDebts && group.simplifyDebts.length > 0 ? (
+            group.simplifyDebts.map((debt, index) => {
+              const fromId = debt.from?._id?.toString?.() || debt.from?.toString?.();
+              const toId = debt.to?._id?.toString?.() || debt.to?.toString?.();
+              const fromUser = group.members.find((member) => member._id?.toString?.() === fromId);
+              const toUser = group.members.find((member) => member._id?.toString?.() === toId);
+              return (
+                <div key={`${debt.from}-${debt.to}-${index}`} className="net-debt-item">
+                  <span>{fromUser?.name || 'Member'} owes {toUser?.name || 'Member'}</span>
+                  <strong>{formatCurrency(debt.amount)}</strong>
+                </div>
+              );
+            })
+          ) : (
+            <div className="empty-feed">No pending net debts. Group is settled.</div>
+          )}
+        </div>
+      </section>
+
       {/* 4. FAB */}
       <div className="fab-container">
-        <button className="fab-btn" onClick={() => navigate(`/group/${id}/add-expense`)}>
-          <Plus size={28} />
-          <span>Add Expense</span>
+        <button className="fab-btn" aria-label="Add Expense" title="Add Expense" onClick={() => navigate(`/groupsDetails/${id}/add-expense`)}>
+          <Plus size={22} />
+          <span className="fab-label">Add Expense</span>
         </button>
       </div>
 

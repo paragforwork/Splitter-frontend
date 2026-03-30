@@ -198,6 +198,31 @@
   gap: 15px;
 }
 
+.net-debts-section {
+  margin-top: 6px;
+}
+
+.net-debt-item {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-primary);
+}
+
+.net-debt-item span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.net-debt-item strong {
+  font-size: 14px;
+  color: var(--danger);
+}
+
 .expense-item {
   display: flex;
   align-items: center;
@@ -264,34 +289,68 @@
 
 /* --- FLOATING ACTION BUTTON (FAB) --- */
 .fab-container {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 200;
+  position: fixed;
+  bottom: 76px;
+  right: 16px;
+  z-index: 1200;
 }
 
 .fab-btn {
   background: var(--primary);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 50px;
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 0;
   box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: width 0.2s ease, border-radius 0.2s ease, padding 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
 }
 
 .fab-btn:active {
-  transform: translateX(-50%) scale(0.95);
+  transform: scale(0.95);
 }
 
-.fab-btn span {
-  font-size: 14px;
+.fab-label {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  transition: max-width 0.2s ease, opacity 0.2s ease, margin-left 0.2s ease;
+  margin-left: 0;
+  font-size: 13px;
   font-weight: 600;
+}
+
+.fab-btn:hover,
+.fab-btn:focus-visible {
+  width: 138px;
+  border-radius: 999px;
+  justify-content: flex-start;
+  padding-left: 14px;
+}
+
+.fab-btn:hover .fab-label,
+.fab-btn:focus-visible .fab-label {
+  max-width: 90px;
+  opacity: 1;
+  margin-left: 8px;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .fab-btn {
+    width: 48px;
+    padding-left: 0;
+    justify-content: center;
+  }
+
+  .fab-btn .fab-label {
+    display: none;
+  }
 }
 /* --- LOADING / EMPTY STATES --- */
 .loading-state, .error-state, .empty-feed {

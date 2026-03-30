@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import { clearLocalSession } from '../lib/authSession.js';
 
 const isTokenValid = () => {
   const token = localStorage.getItem('authToken');
@@ -17,14 +18,14 @@ const isTokenValid = () => {
     // 3. Check if expired
     if (decoded.exp < currentTime) {
       console.log('Token expired - clearing storage');
-      localStorage.clear();
+      clearLocalSession();
       return false;
     }
 
     return true;
   } catch (error) {
     // Returns false if token is invalid or corrupt
-    localStorage.clear();
+    clearLocalSession();
     return false;
   }
 };

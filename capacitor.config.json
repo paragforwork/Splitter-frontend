@@ -1,5 +1,11 @@
 {
   "appId": "com.splitterapp.app",
   "appName": "splitter",
-  "webDir": "dist"
+  "webDir": "dist",
+  "plugins": {
+    "FirebaseAuthentication": {
+      "skipNativeAuth": false,
+      "providers": ["google.com"]
+    }
+  }
 }

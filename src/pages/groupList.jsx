@@ -4,7 +4,12 @@ import {
   ArrowLeft, Plus, Search, Users, 
   ChevronRight, ArrowUpRight, ArrowDownLeft ,X,Briefcase, Home as HomeIcon, Heart, Globe, LogOut
 } from 'lucide-react';
+import LoadingSpinner from '../components/loadingSpinner.jsx';
+import { getApiBase } from '../lib/apiBase.js';
+import { clearLocalSession } from '../lib/authSession.js';
 import '../styles/groupList.css'; // Separate CSS file
+
+const API_BASE = getApiBase();
 
 const GroupsList = () => {
   const navigate = useNavigate();
@@ -33,7 +38,7 @@ const GroupsList = () => {
         return;
       }
       
-      const res = await fetch('http://localhost:4000/api/groups/allgroups', {
+      const res = await fetch(`${API_BASE}/api/groups/allgroups`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -42,8 +47,7 @@ const GroupsList = () => {
         setGroups(data.groups);
       } else if (data.expired || data.invalid) {
         // Token is invalid or expired, redirect to login
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('user');
+        clearLocalSession();
         navigate('/signup');
       }
     } catch (err) {
@@ -53,21 +57,19 @@ const GroupsList = () => {
     }
   };
 
-  // --- HELPER: Calculate My Balance in a Group ---
+  // --- HELPER: Use backend-computed balance when available ---
   const getGroupBalance = (group) => {
+    if (typeof group.myBalance === 'number') {
+      return group.myBalance;
+    }
     if (!currentUser || !group.simplifyDebts) return 0;
 
     let balance = 0;
-    
-    // 1. Check if I owe anyone (Negative)
     group.simplifyDebts.forEach(debt => {
-      if (debt.from === currentUser.id) {
-        balance -= debt.amount;
-      }
-      // 2. Check if anyone owes me (Positive)
-      if (debt.to === currentUser.id) {
-        balance += debt.amount;
-      }
+      const fromId = debt.from?._id || debt.from;
+      const toId = debt.to?._id || debt.to;
+      if (fromId === currentUser.id) balance -= Number(debt.amount || 0);
+      if (toId === currentUser.id) balance += Number(debt.amount || 0);
     });
 
     return balance;
@@ -93,12 +95,12 @@ const GroupsList = () => {
       // Check if token exists
       if (!token) {
         alert("You are not logged in. Please login first.");
-        localStorage.clear();
+        clearLocalSession();
         navigate('/signup');
         return;
       }
       
-      const response=await fetch('http://localhost:4000/api/groups',{
+      const response=await fetch(`${API_BASE}/api/groups`,{
         method:'POST',
         headers:{
           'Content-Type':'application/json',
@@ -115,7 +117,7 @@ const GroupsList = () => {
       // Handle authentication errors
       if (response.status === 401 || response.status === 403) {
         alert("Your session has expired. Please login again.");
-        localStorage.clear();
+        clearLocalSession();
         navigate('/signup');
         return;
       }
@@ -166,7 +168,7 @@ const GroupsList = () => {
       {/* 3. GROUPS LIST */}
       <div className="groups-grid">
         {loading ? (
-          <p className="loading-text">Loading groups...</p>
+          <LoadingSpinner />
         ) : filteredGroups.length > 0 ? (
           filteredGroups.map(group => {
             const balance = getGroupBalance(group);

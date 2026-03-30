@@ -11,7 +11,10 @@
     "runapp": "npm run build && npx cap sync android && npx cap run android"
   },
   "dependencies": {
+    "@capacitor-firebase/authentication": "^8.1.0",
     "@capacitor/android": "^8.0.1",
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/app-launcher": "^8.0.1",
     "@capacitor/core": "^8.0.1",
     "@react-oauth/google": "^0.13.4",
     "firebase": "^12.7.0",

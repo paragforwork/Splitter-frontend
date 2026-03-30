@@ -32,7 +32,7 @@ body {
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 70px; /* Slightly taller for mobile comfort */
+  height: 58px;
   background: rgba(30, 41, 59, 0.95); /* Semi-transparent dark */
   backdrop-filter: blur(10px);        /* Glassmorphism effect */
   display: flex;
@@ -40,7 +40,7 @@ body {
   align-items: center;
   border-top: 1px solid var(--border-color);
   z-index: 1000;
-  padding-bottom: 10px; /* Safe area for iPhone home bar */
+  padding-bottom: 2px;
 }
 
 .nav-item {
@@ -59,7 +59,7 @@ body {
 
 .nav-item span {
   font-size: 10px;
-  margin-top: 6px;
+  margin-top: 4px;
   color: var(--text-secondary);
   font-weight: 500;
 }
@@ -121,6 +121,11 @@ body {
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
+.neutral-gradient {
+  background: linear-gradient(135deg, #475569 0%, #334155 100%);
+  border: 1px solid #64748b;
+}
+
 /* Brighter Gradients for Dark Mode Contrast */
 .green-gradient {
   background: linear-gradient(135deg, #82e4c5 0%, #02513a 100%);
@@ -171,6 +176,32 @@ body {
   background: rgba(0, 0, 0, 0.4);
 }
 
+.summary-inline {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.summary-inline div {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+
+.summary-inline small {
+  display: block;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.summary-inline strong {
+  display: block;
+  margin-top: 3px;
+  font-size: 14px;
+}
+
 /* --- QUICK ACTIONS --- */
 .quick-actions {
   display: flex;
@@ -178,12 +209,24 @@ body {
   margin-bottom: 35px;
 }
 
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+  margin-bottom: 30px;
+}
+
 .action-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  width: 30%;
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
 }
 
 .icon-box {
@@ -339,6 +382,30 @@ body {
 .activity-amount {
   font-size: 14px;
   font-weight: 700;
+}
+
+.activity-section {
+  margin-bottom: 24px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.filters button {
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.filters .active {
+  color: #fff;
+  background: #334155;
 }
 /* --- MODAL OVERLAY (Blurred Background) --- */
 .modal-overlay {

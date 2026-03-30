@@ -136,7 +136,7 @@ const Signup = () => {
       ) {
         setError('Google Sign-In failed due to Google Play network/auth issue (code 7). Check internet on the device, enable automatic date/time, update Google Play Services, then try again.');
       } else if (loopbackInMessage) {
-        setError('Cannot reach backend from Android loopback. For phone: run adb reverse for port 4000 or set VITE_API_BASE_URL/VITE_API_FALLBACK_URLS to your LAN IP (http://192.168.x.x:4000).');
+        setError('Cannot reach backend from Android loopback. For physical phone, run: adb -s <deviceId> reverse tcp:4000 tcp:4000. For emulator, ensure backend is running and 10.0.2.2:4000 is reachable.');
       } else if (messageLower.includes('failed to fetch') || messageLower.includes('network request failed')) {
         setError('Cannot reach backend. Start server on port 4000 and ensure emulator/device can access your machine.');
       } else {
